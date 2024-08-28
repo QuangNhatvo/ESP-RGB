@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+/home/nhat/IDF/ESP-RGB/build/CMakeFiles/bootloader
+/home/nhat/IDF/ESP-RGB/build/CMakeFiles/bootloader.rule
+/home/nhat/IDF/ESP-RGB/build/CMakeFiles/bootloader-complete.rule
+/home/nhat/IDF/ESP-RGB/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+/home/nhat/IDF/ESP-RGB/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+/home/nhat/IDF/ESP-RGB/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+/home/nhat/IDF/ESP-RGB/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+/home/nhat/IDF/ESP-RGB/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+/home/nhat/IDF/ESP-RGB/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+/home/nhat/IDF/ESP-RGB/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
