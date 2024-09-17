@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "ESP-RGB",
-    "project_version":    "1",
+    "project_version":    "13d1d2a-dirty",
     "project_path":       "/home/nhat/IDF/ESP-RGB",
     "idf_path":           "/home/nhat/esp/v5.3/esp-idf",
     "build_dir":          "/home/nhat/IDF/ESP-RGB/build",
@@ -1165,7 +1165,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "/home/nhat/IDF/ESP-RGB/build/esp-idf/main/libmain.a",
-            "sources": [ "/home/nhat/IDF/ESP-RGB/main/led_strip_example_main.c" ],
+            "sources": [ "/home/nhat/IDF/ESP-RGB/main/wifi.c", "/home/nhat/IDF/ESP-RGB/main/tls.c", "/home/nhat/IDF/ESP-RGB/main/led_strip_example_main.c" ],
             "include_dirs": [ "." ]
         },
         "mbedtls": {

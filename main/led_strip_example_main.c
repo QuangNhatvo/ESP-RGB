@@ -13,6 +13,8 @@
 #include "nvs_flash.h"
 #include "esp_ota_ops.h"
 #include "esp_timer.h"
+#include "tls.h"
+#include "wifi.h"
 
 #define RMT_LED_STRIP_RESOLUTION_HZ 10000000 // 10MHz resolution, 1 tick = 0.1us (led strip needs a high resolution)
 #define RMT_LED_STRIP_GPIO_NUM      8
@@ -22,9 +24,10 @@
 #define EXAMPLE_FRAME_DURATION_MS   20
 #define EXAMPLE_ANGLE_INC_FRAME     0.02
 #define EXAMPLE_ANGLE_INC_LED       0.3
-#define FIRMWARE_VERSION "1.3.4"
+#define FIRMWARE_VERSION "1.8.1"
 
 static const char *TAG = "example";
+char *json_buffer;
 
 static uint8_t led_strip_pixels[EXAMPLE_LED_NUMBERS * 3];
 
@@ -101,11 +104,35 @@ void store_nvs_version(){
     nvs_close(my_handle);
 }
 
-void timer_callback(void *arg){ 
-    const esp_partition_t *factory_partition = esp_partition_find_first(ESP_PARTITION_TYPE_APP, ESP_PARTITION_SUBTYPE_APP_FACTORY, NULL); 
-    if (factory_partition != NULL){
-        esp_ota_set_boot_partition(factory_partition);
-        esp_restart();
+void timer_callback(void *arg) {
+    char* json_response = https_get_response();
+    if (json_response == NULL) {
+        ESP_LOGE(TAG, "None response from API");
+        return;
+    }
+    char* new_version = get_version(json_response);
+    if (new_version == NULL) {
+        ESP_LOGE(TAG, "Can't not parse version JSON");
+        return;
+    }
+    
+    ESP_LOGI(TAG, "current version: %s, version get from API: %s", FIRMWARE_VERSION, new_version);
+    if (strcmp(new_version, FIRMWARE_VERSION) > 0) {
+        ESP_LOGI(TAG, "OTA updatingg ...");
+        const esp_partition_t *factory_partition = esp_partition_find_first(ESP_PARTITION_TYPE_APP, ESP_PARTITION_SUBTYPE_APP_FACTORY, NULL);
+        if (factory_partition != NULL) {
+            esp_err_t err = esp_ota_set_boot_partition(factory_partition);
+            if (err == ESP_OK) {
+                ESP_LOGI(TAG, "restarting ...");
+                esp_restart();
+            } else {
+                ESP_LOGE(TAG, "can not setting partitions reboot.");
+            }
+        } else {
+            ESP_LOGE(TAG, "can not find factory partitions");
+        }
+    } else {
+        ESP_LOGI(TAG, "no new version");
     }
 }
 
@@ -141,14 +168,19 @@ void app_main(void)
     };
     float offset = 0;
 
+    wifi_init_sta();
+
+    /*-------------- Ngắt -------------------*/
     esp_timer_handle_t timer; 
     esp_timer_create_args_t timer_args = {
         .callback = &timer_callback,
         .arg = NULL,
-        .name = "hourly_check_timer"
+        .name = "version_check_timer"
     };
     ESP_ERROR_CHECK(esp_timer_create(&timer_args, &timer));
-    ESP_ERROR_CHECK(esp_timer_start_periodic(timer, (30 * 1000000)));    
+    ESP_ERROR_CHECK(esp_timer_start_periodic(timer, (30* 1000000)));    
+
+    /*---------------------------------------*/
 
     while (1) {
         for (int led = 0; led < EXAMPLE_LED_NUMBERS; led++) {
